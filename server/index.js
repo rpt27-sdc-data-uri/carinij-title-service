@@ -7,6 +7,8 @@ app.use(cors());
 app.use(express.static('public'));
 app.use(express.json());
 
+
+// GET routes
 app.get('/api/book/:id', (req, res) => {
   Book.getById(req.params.id)
     .then((result) => {
@@ -40,6 +42,47 @@ app.get('/api/book/:id/related', (req, res) => {
     })
     .catch((err) => {
       res.status(500);
+      console.log('db err: ', err);
+      res.send(err);
+    });
+});
+
+// POST route
+app.post('/api/book/', (req, res) => {
+  Book.createNewBook(req.body)
+    .then((result) => {
+      res.send(result);
+    })
+    .catch((err) => {
+      res.status(500);
+      console.log('db err: ', err);
+      res.send(err);
+    });
+});
+
+// PUT route
+// app.put('/api/book/:id', (req, res) => {
+//   Book.getById(req.params.id)
+//     .then((result) => {
+//       res.send(result);
+//     })
+//     .catch((err) => {
+//       res.status(500);
+//       console.log('db err: ', err);
+//       res.send(err);
+//     });
+// });
+
+// DELETE route
+app.delete('/api/book/:id', (req, res) => {
+  console.log("Received request to /delete");
+  Book.deleteById(req.params.id)
+    .then((result) => {
+      console.log('Deleted ' + result + ' rows.');
+      res.send("Successfully deleted book at id: " + req.params.id);
+    })
+    .catch((err) => {
+      res.sendStatus(500);
       console.log('db err: ', err);
       res.send(err);
     });
