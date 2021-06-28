@@ -55,9 +55,9 @@ module.exports.getRelatedById = (id) => {
         where: {
           [Op.and] : [
             {narrator: result.narrator},
-            //don't include results of the same author - so it is only the same narrator
+            // Don't include results with the same author - only the same narrator
             {author: {[Op.not]: author}},
-            //dont include the original book
+            // Don't include the original book
             {id: {[Op.not]: id}}
           ]
         },
@@ -70,7 +70,7 @@ module.exports.getRelatedById = (id) => {
         where: {
           [Op.and] : [
             {author: author},
-            //dont include the original book
+            // Don't include the original book
             {id: {[Op.not]: id}}
           ]
         },
@@ -87,3 +87,53 @@ module.exports.getRelatedById = (id) => {
   });
 };
 
+module.exports.createNewBook = (newBook) => {
+  console.log("Creating new book.");
+  console.log(newBook);
+  return new Promise((resolve, reject) => {
+    db.Book.create({
+      title: newBook.title,
+      subtitle: newBook.subtitle,
+      author: newBook.author,
+      narrator: newBook.narrator,
+      imageUrl: newBook.imageUrl,
+      audioSampleUrl: newBook.audioSampleUrl,
+      length: newBook.length,
+      version: newBook.version
+    })
+    .then (result => {
+      resolve(result);
+    })
+    .catch(err => {
+      reject(err);
+    })
+
+    // db.Category.findOrCreate({
+    //   default: { category: newBook.category }
+    // })
+    // .then (result => {
+    //   resolve(result);
+    // })
+    // .catch(err => {
+    //   reject(err);
+    // })
+
+  });
+};
+
+module.exports.deleteById = (id) => {
+  console.log("Deleting book at: " + id);
+  return new Promise((resolve, reject) => {
+    db.Book.destroy({
+      where: {
+        id: id
+      }
+    })
+    .then (result => {
+      resolve(result);
+    })
+    .catch(err => {
+      reject(err);
+    })
+  });
+};
