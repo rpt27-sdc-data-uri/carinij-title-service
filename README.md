@@ -85,15 +85,57 @@ DB_HOST={mysqlHost}
      it will also not include books by the original book's author in the byNarrator list
 
 ## API
- The API contains three routes:
+ The API contains the following routes:
+
+ GET:
    - /api/book/{id}
-       * returns a single book
+       * returns a single book at id (replace {id} with a number)
    - /api/books
-       * takes in json 'ids' - an array of ids **OR** a query param 'ids' equal to a comma separated list of ids
+       * takes in json 'ids' - an array of ids **OR** a query param 'ids' consisting of a comma-separated list of ids
        * returns an array of book objects
    - /api/book/{id}/related
        * returns an object containing related books
        * {byAuthor: [], byNarrator:[]}
+
+POST:
+   - /api/book
+      * req.body should be in JSON format like this:
+      {
+        "title": "{title}",
+        "subtitle": "{subtitle}",
+        "author": "{author}",
+        "narrator": "{narrator}",
+        "imageUrl": "{imageUrl}",
+        "audioSampleUrl: "{audioSampleUrl}",
+        "length": "{length}",
+        "version": "{version}",
+        "category": ["{category}", "{category}"]
+      }
+      * All should be strings (including length)
+      * Title, author, and narrator are required; the rest are strongly suggested
+      * You may list as many categories as you like as strings inside []
+
+PUT:
+   - /api/book/{id}
+      * req.body should be in JSON format like this:
+      {
+        "title": "{title}",
+        "subtitle": "{subtitle}",
+        "author": "{author}",
+        "narrator": "{narrator}",
+        "imageUrl": "{imageUrl}",
+        "audioSampleUrl: "{audioSampleUrl}",
+        "length": "{length}",
+        "version": "{version}",
+        "category": ["{category}", "{category}", "{etc}"]
+      }
+      * All should be strings (including length)
+      * Title, author, and narrator are required; the rest are strongly suggested
+      * You may list as many categories as you like as strings inside []
+
+DELETE:
+   - /api/book/{id}
+      * deletes a single book at the given id
 
 ## TESTING
 
