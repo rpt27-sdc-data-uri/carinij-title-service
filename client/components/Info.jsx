@@ -16,7 +16,7 @@ class Info extends React.Component {
        <li>{this.props.book.version}</li>
        <li>Categories: {
          this.props.book.categories.map((category, i) => {
-           //dont add a comma on the last category
+           // Don't add a comma on the last category
            if (i === this.props.book.categories.length - 1) {
              return (<a key={i} href="#">{category.name}</a>)
            }
