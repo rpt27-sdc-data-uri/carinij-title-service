@@ -19,7 +19,8 @@
     "react-prod": "webpack --mode production",
     "server-dev": "nodemon ./server/start.js",
     "seed-db": "node ./db/setup/run-seed.js",
-    "test": "jest"
+    "test": "jest",
+    "pop": "node ./db/populate/pop.js"
   },
   "repository": {
     "type": "git",
@@ -58,6 +59,8 @@
     "express": "^4.17.1",
     "jest-fetch-mock": "^3.0.3",
     "mysql2": "^2.2.5",
+    "pg": "^7.18.2",
+    "pg-hstore": "^2.3.4",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-star-ratings": "^2.3.0",
