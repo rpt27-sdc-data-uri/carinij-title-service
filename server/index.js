@@ -51,6 +51,11 @@ app.get('/api/book/:id/related', (req, res) => {
 app.post('/api/book/', (req, res) => {
   Book.createNewBook(req.body)
     .then((result) => {
+      console.log("result.id: " + result.id);
+      // TODO
+      // get the id
+      // see if categories exist; if not, create them
+      // associate the categories with the id
       res.send(result);
     })
     .catch((err) => {
