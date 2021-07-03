@@ -4,7 +4,12 @@ require('dotenv').config();
 const sequelize = new Sequelize('audible', 'carinij', 'mypassword', {
   host: 'localhost',
   dialect: 'postgres',
-  logging: false
+  logging: false,
+  pool: {
+    max: 20,
+    min: 0,
+    acquire: 120000
+  }
 })
 
 const testDatabaseConnection = sequelize.authenticate()
