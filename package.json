@@ -20,7 +20,7 @@
     "server-dev": "nodemon ./server/start.js",
     "seed-db": "node ./db/setup/run-seed.js",
     "test": "jest",
-    "pop": "node ./db/populate/pop.js"
+    "pop": "node --max-old-space-size=16384 ./db/populate/pop.js"
   },
   "repository": {
     "type": "git",
