@@ -1,5 +1,5 @@
 const { Sequelize, DataTypes } = require('sequelize');
-require('dotenv').config();
+// require('dotenv').config();
 
 const sequelize = new Sequelize('audible', 'carinij', 'mypassword', {
   host: 'localhost',
@@ -12,7 +12,7 @@ const sequelize = new Sequelize('audible', 'carinij', 'mypassword', {
   }
 })
 
-const testDatabaseConnection = sequelize.authenticate()
+sequelize.authenticate()
   .then(() => console.log("Connection has been established successfully."))
   .catch((err) => console.log(err));
 
@@ -55,12 +55,12 @@ const Category = sequelize.define('Category', {
 
 const Book_Category = sequelize.define('Book_Category', {
   id: {
-    type: DataTypes.INTEGER(11),
+    type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true
   },
   book_id: {
-    type: DataTypes.INTEGER(11),
+    type: DataTypes.INTEGER,
     primaryKey: false,
     unique: true,
     references: {
@@ -71,7 +71,7 @@ const Book_Category = sequelize.define('Book_Category', {
     onUpdate: 'cascade',
   },
   category_id: {
-    type: DataTypes.INTEGER(11),
+    type: DataTypes.INTEGER,
     primaryKey: false,
     unique: true,
     references: {

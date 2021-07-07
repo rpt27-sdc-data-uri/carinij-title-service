@@ -16,6 +16,9 @@ class Rating extends React.Component {
     .then(response => {
       this.setState({rating: response[0].overall});
     })
+    .catch(error => {
+      console.log(error);
+    })
   }
 
   render() {
