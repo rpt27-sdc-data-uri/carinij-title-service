@@ -7,9 +7,11 @@ app.use(cors());
 app.use(express.static('public'));
 app.use(express.json());
 
+console.log("Routes up and running.");
 
 // GET routes
 app.get('/api/book/:id', (req, res) => {
+  console.log("Received GET request to /api/book/" + req.params.id);
   Book.getById(req.params.id)
     .then((result) => {
       res.send(result);
@@ -22,6 +24,7 @@ app.get('/api/book/:id', (req, res) => {
 });
 
 app.get('/api/books', (req, res) => {
+  console.log("Received GET request to /api/books; processing.")
   //need to convert query sting into array of ids
     const ids = req.query.ids ? req.query.ids.split(',').map(string => parseInt(string)) : req.body.ids;
   Book.getByIds(ids)
