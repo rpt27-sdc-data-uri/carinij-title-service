@@ -2,14 +2,16 @@ const { Op } = require('sequelize');
 const db = require('../db.js');
 
 module.exports.getById = (id) => {
+  console.log("Getting by id: " + id);
   return new Promise((resolve, reject) => {
     db.Book.findOne({
       where: {
-        id
+        id: id
       },
       include: 'categories'
     })
     .then (result => {
+      console.log(result);
       resolve(result);
     })
     .catch(err => {
