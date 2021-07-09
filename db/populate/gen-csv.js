@@ -27,35 +27,54 @@ const capitalizeAllFirsts = (string) => {
   return stringArray.join(' ');
 }
 
+const generateRandomDate = (start, end) => {
+  return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+}
+
+const generateCreatedAt = () => {
+  return generateRandomDate(new Date(2017, 0, 1), new Date());
+}
+
+const generateUpdatedAt = (start) => {
+  return generateRandomDate(start, new Date());
+}
+
 const createCategories = (number) => {
   console.log("Writing categories.csv with " + number + " records.");
   const readable = new Stream.Readable();
   readable.pipe(fs.createWriteStream('categories.csv'));
-  readable.push("name" + "\n");
-  for (let i = 0; i < number; i++) {
-    const result = getRandom(100);
-    if (result < 30) {
-     readable.push(capitalizeFirst(faker.random.word()) + "\n");
-    } else if (result < 70) {
+  readable.push("name, createdAt, updatedAt\n");
+  let resultObject = {};
+  while (Object.keys(resultObject).length < number) {
+    let stringToPush = "";
+    const randomNumber = getRandom(100);
+    if (randomNumber < 30) {
+     stringToPush = capitalizeFirst(faker.random.word());
+    } else if (randomNumber < 70) {
       let firstWord = capitalizeFirst(faker.random.word());
       let secondWord = capitalizeFirst(faker.random.word());
-      if (result < 50) {
-        readable.push(firstWord + " " + secondWord + "\n");
+      if (randomNumber < 50) {
+        stringToPush = firstWord + " " + secondWord;
       } else {
-        readable.push(firstWord + " & " + secondWord + "\n");
+        stringToPush = firstWord + " & " + secondWord;
       }
     } else {
       let firstWord = capitalizeFirst(faker.random.word());
       let secondWord = capitalizeFirst(faker.random.word());
       let thirdWord = capitalizeFirst(faker.random.word());
-      if (result < 80) {
-        readable.push(firstWord + " " + secondWord + " & " + thirdWord + "\n");
-      } else if (result < 90) {
-        readable.push(firstWord + ", " + secondWord + " & " + thirdWord + "\n");
+      if (randomNumber < 80) {
+        stringToPush = firstWord + " " + secondWord + " & " + thirdWord;
+      } else if (randomNumber < 90) {
+        stringToPush = '"'+ firstWord + ', ' + secondWord + ' & ' + thirdWord + '"';
       } else {
-        readable.push(firstWord + " & " + secondWord + " " + thirdWord + "\n");
+        stringToPush = firstWord + " & " + secondWord + " " + thirdWord;
       }
     }
+    const createdAtDate = generateCreatedAt();
+    resultObject[stringToPush] = stringToPush + "," + createdAtDate.toISOString() + "," + generateUpdatedAt(createdAtDate).toISOString()  + "\n";
+  }
+  for (let key in resultObject) {
+    readable.push(resultObject[key]);
   }
   readable.push(null);
   console.log("Finished pushing data to categories.csv")
@@ -67,22 +86,24 @@ const createBooks = (number) => {
   let currentChunk = 1;
   const readable = new Stream.Readable();
   readable.pipe(fs.createWriteStream('books.csv'));
-  readable.push("title,subtitle,author,narrator,imageUrl,audioSampleUrl,length,version,categories\n");
+  readable.push("title,subtitle,author,narrator,imageUrl,audioSampleUrl,length,version,createdAt,updatedAt\n");
   for (let i = 0; i < number; i++) {
+    const createdAtDate = generateCreatedAt();
     const newBook = {
-      title: capitalizeAllFirsts(faker.company.bs()),
-      subtitle: capitalizeAllFirsts(faker.company.catchPhrase()),
-      author: faker.name.findName(),
-      narrator: faker.name.findName(),
-      imageUrl: faker.image.imageUrl(),
-      audioSampleUrl: faker.internet.url(),
-      length: (getRandom(29) + 4) + " hours and " + getRandom(60) + " minutes.",
-      version: getRandom(100) < 85 ? "Unabridged Audiobook" : "Abridged Audiobook",
-      categories: "[{categoryId: " + getRandom(200) + "}, {categoryId: " + getRandom(200) + "}]"
+      title: capitalizeAllFirsts(faker.company.bs()) + ",",
+      subtitle: capitalizeAllFirsts(faker.company.catchPhrase()) + ",",
+      author: faker.name.findName() + ",",
+      narrator: faker.name.findName() + ",",
+      imageUrl: faker.image.imageUrl() + ",",
+      audioSampleUrl: faker.internet.url() + ",",
+      length: (getRandom(29) + 4) + " hours and " + getRandom(60) + " minutes" + ",",
+      version: getRandom(100) < 85 ? "Unabridged Audiobook" + "," : "Abridged Audiobook" + ",",
+      createdAt: createdAtDate.toISOString() + ",",
+      updatedAt: generateUpdatedAt(createdAtDate).toISOString()
     }
     let stringToPush = "";
     for (let key in newBook) {
-      stringToPush += newBook[key] + ",";
+      stringToPush += newBook[key];
     }
     stringToPush += "\n"
     readable.push(stringToPush);
