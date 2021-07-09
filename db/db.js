@@ -4,7 +4,7 @@ const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = new Sequelize('audible', 'carinij', 'mypassword', {
   host: 'localhost',
   dialect: 'postgres',
-  logging: false,
+  // logging: false,
   pool: {
     max: 20,
     min: 0,
@@ -44,9 +44,6 @@ const Book = sequelize.define('Book', {
   version: {
     type: DataTypes.STRING
   },
-  categoryId: {
-    type: DataTypes.INTEGER
-  }
 });
 
 const Category = sequelize.define('Category', {
@@ -101,7 +98,7 @@ const Category = sequelize.define('Category', {
 //   // foreignKey: 'category_id'
 // });
 
-// sequelize.sync();
+sequelize.sync();
 
 module.exports.sequelize = sequelize;
 module.exports.Book = Book;
