@@ -1,53 +1,75 @@
-const db = require('../db.js');
-const generateData = require('./generate');
+const fs = require('fs');
+const {Pool, Client} = require('pg');
+const copyFrom = require('pg-copy-streams').from;
 
-const totalRecordsToCreate = 20000;
-const chunkSize = 20000;
-const numChunks = totalRecordsToCreate / chunkSize;
-const parallels = 1;
-const chunksPerParallel = numChunks / parallels;
+const pool = new Pool({
+  host: "localhost",
+  database: "audible",
+  user: "carinij",
+  password: "mypassword",
+});
 
-const populateDatabase = () => {
-  console.log("Populating database.");
-  let categoryList = [];
-  db.Category.sync({force: true})
-  .then(() => {
-    categoryList = generateData.manyNewCategories(200);
+pool.on('error', (err, client) => {
+  console.error('Unexpected error on idle client: ' + err);
+  process.exit(-1);
+});
+
+pool
+  .query('DROP TABLE IF EXISTS "Categories"')
+  .then(res => console.log('"Categories" table dropped.'))
+  .then( () => {
+    return pool
+      .query('CREATE TABLE IF NOT EXISTS "Categories" ("id" SERIAL PRIMARY KEY, "name" TEXT UNIQUE, "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL, "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL);')
+      .then(() => console.log('Create "Categories" table successful.'))
+      .catch(err => console.log('Error creating "Categories" table: ' + err));
   })
-  .then(() => {
-    db.Category.bulkCreate(categoryList, { include: db.books })
-    .then((result) => {
-      console.log(result);
+  .then( () => {
+    pool.connect( (err, client, done) => {
+      const writeStream = client.query(copyFrom('COPY "Categories" (name, "createdAt", "updatedAt") FROM STDIN CSV HEADER'));
+      const readStream = fs.createReadStream('categories.csv');
+      readStream.on('error', (err) => {
+        console.log('Error in Categories readStream: ' + err);
+        done;
+      });
+      writeStream.on('error', (err) => {
+        console.log('Error in Categories writeStream: ' + err);
+        done;
+      });
+      writeStream.on('finish', () => {
+        console.log('Categories writeStream finished.');
+        done;
+      });
+      readStream.pipe(writeStream);
     });
   })
-  .then(() => {
-    db.Book.sync({force: true})
-    .then(() => {
-      for (let i = 0; i < parallels; i++) {
-        console.log("Initializing parallel " + i + ".");
-        createChunk(i, 1);
-      }
-    })
-  })
-  .catch((err) => {
-    console.log("Error in populating database: " + err);
-  })
-}
+  .catch(err => console.log("Error caught: " + err));
 
-const createChunk = (chunkMultiplier, chunkCounter) => {
-  let currentChunk = (chunkMultiplier * chunksPerParallel) + chunkCounter;
-  console.log("Starting on chunk #" + currentChunk + " of " + numChunks + ".");
-  db.Book.bulkCreate(generateData.manyNewBooks(20000), { include: db.categories })
-  .then(() => {
-    console.log("Chunk " + currentChunk + " complete.");
-    chunkCounter++;
-    if (chunkCounter <= chunksPerParallel) {
-      createChunk(chunkMultiplier, chunkCounter);
-    }
+  pool
+  .query('DROP TABLE IF EXISTS "Books"')
+  .then(res => console.log('"Books" table dropped.'))
+  .then( () => {
+    return pool
+      .query('CREATE TABLE IF NOT EXISTS "Books" ("id" SERIAL PRIMARY KEY, "title" TEXT, "subtitle" TEXT, "author" TEXT, "narrator" TEXT, "imageUrl" TEXT, "audioSampleUrl" TEXT, "length" TEXT, "version" TEXT, "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL, "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL);')
+      .then(() => console.log('Create "Books" table successful.'))
+      .catch(err => console.log('Error creating "Categories" table: ' + err));
   })
-  .catch((err) => {
-    console.log("Error in bulkCreate on chunk " + i + ": " + err);
+  .then( () => {
+    pool.connect( (err, client, done) => {
+      const writeStream = client.query(copyFrom('COPY "Books" ("title", "subtitle", "author", "narrator", "imageUrl", "audioSampleUrl", "length", "version", "createdAt", "updatedAt") FROM STDIN CSV HEADER'));
+      const readStream = fs.createReadStream('books.csv');
+      readStream.on('error', (err) => {
+        console.log('Error in Books readStream: ' + err);
+        done;
+      });
+      writeStream.on('error', (err) => {
+        console.log('Error in Books writeStream: ' + err);
+        done;
+      });
+      writeStream.on('finish', () => {
+        console.log('Books writeStream finished.');
+        done;
+      });
+      readStream.pipe(writeStream);
+    });
   })
-}
-
-populateDatabase();
+  .catch(err => console.log("Error caught: " + err));
