@@ -127,7 +127,8 @@ const dropBooksCategories = () => {
 
 const runAQuery = () => {
   return pool
-    .query('SELECT * FROM "Books" JOIN "BooksCategories" ON "Books"."id" = "BooksCategories"."bookId" JOIN "Categories" ON "BooksCategories"."categoryId" = "Categories"."id" WHERE "BooksCategories"."bookId" = 9786345')
+//    .query('SELECT * FROM "Books" JOIN "BooksCategories" ON "Books"."id" = "BooksCategories"."bookId" JOIN "Categories" ON "BooksCategories"."categoryId" = "Categories"."id" WHERE "Books"."author" = \'Andrew DuBuque\'')
+    .query('UPDATE "Books" SET "author" = \'Dr. Bridget Sipes\' WHERE "Books"."author" = \'Bridget Sipes\'')
     .then(res => console.log(res.rows));
 }
 

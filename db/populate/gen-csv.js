@@ -2,6 +2,8 @@ const fs = require('fs');
 const faker = require('faker');
 const { Stream } = require('stream');
 
+const TARGET_DATABASE = 'neo4j';
+
 const getRandom = (max) => {
   return (Math.floor(Math.random() * max));
 }
@@ -31,38 +33,52 @@ const generateUpdatedAt = (start) => {
 }
 
 const createCategories = (number) => {
-  console.log("Writing categories.csv with " + number + " records.");
+
   const readable = new Stream.Readable();
-  readable.pipe(fs.createWriteStream('categories.csv'));
-  readable.push("name, createdAt, updatedAt\n");
+
+  if (TARGET_DATABASE === 'neo4j') {
+    console.log("Writing categories-neo4j.csv with " + number + " records.");
+    readable.pipe(fs.createWriteStream('categories-neo4j.csv'));
+    readable.push("categoryId:ID(Category),name,createdAt,updatedAt\n");
+  } else {
+    console.log("Writing categories.csv with " + number + " records.");
+    readable.pipe(fs.createWriteStream('categories.csv'));
+    readable.push("name,createdAt,updatedAt\n");
+  }
+
   let resultObject = {};
-  while (Object.keys(resultObject).length < number) {
+  let currentIndex = 0;
+  while (currentIndex < number - 1) {
+    currentIndex = Object.keys(resultObject).length;
     let stringToPush = "";
+    if (TARGET_DATABASE === 'neo4j') {
+      stringToPush += (currentIndex + 1) + ",";
+    }
     const randomNumber = getRandom(100);
     if (randomNumber < 30) {
-     stringToPush = capitalizeFirst(faker.random.word());
+     stringToPush += capitalizeFirst(faker.random.word());
     } else if (randomNumber < 70) {
       let firstWord = capitalizeFirst(faker.random.word());
       let secondWord = capitalizeFirst(faker.random.word());
       if (randomNumber < 50) {
-        stringToPush = firstWord + " " + secondWord;
+        stringToPush += firstWord + " " + secondWord;
       } else {
-        stringToPush = firstWord + " & " + secondWord;
+        stringToPush += firstWord + " & " + secondWord;
       }
     } else {
       let firstWord = capitalizeFirst(faker.random.word());
       let secondWord = capitalizeFirst(faker.random.word());
       let thirdWord = capitalizeFirst(faker.random.word());
       if (randomNumber < 80) {
-        stringToPush = firstWord + " " + secondWord + " & " + thirdWord;
+        stringToPush += firstWord + " " + secondWord + " & " + thirdWord;
       } else if (randomNumber < 90) {
-        stringToPush = '"'+ firstWord + ', ' + secondWord + ' & ' + thirdWord + '"';
+        stringToPush += '"'+ firstWord + ', ' + secondWord + ' & ' + thirdWord + '"';
       } else {
-        stringToPush = firstWord + " & " + secondWord + " " + thirdWord;
+        stringToPush += firstWord + " & " + secondWord + " " + thirdWord;
       }
     }
     const createdAtDate = generateCreatedAt();
-    resultObject[stringToPush] = stringToPush + ", " + createdAtDate.toISOString() + ", " + generateUpdatedAt(createdAtDate).toISOString()  + "\n";
+    resultObject[currentIndex] = stringToPush + "," + createdAtDate.toISOString() + "," + generateUpdatedAt(createdAtDate).toISOString()  + "\n";
   }
   for (let key in resultObject) {
     readable.push(resultObject[key]);
@@ -72,27 +88,38 @@ const createCategories = (number) => {
 }
 
 const createBooks = (number) => {
-  console.log("Creating books.csv with " + number + " records.");
   let onePercent = number / 100;
   let currentChunk = 1;
   const readable = new Stream.Readable();
-  readable.pipe(fs.createWriteStream('books.csv'));
-  readable.push("title, subtitle, author, narrator, imageUrl, audioSampleUrl, length, version, createdAt, updatedAt\n");
+
+  if (TARGET_DATABASE === 'neo4j') {
+    console.log("Writing books-neo4j.csv with " + number + " records.");
+    readable.pipe(fs.createWriteStream('books-neo4j.csv'));
+    readable.push("bookId:ID(Book),title,subtitle,author,narrator,imageUrl,audioSampleUrl,length,version,createdAt,updatedAt\n");
+  } else {
+    console.log("Writing books.csv with " + number + " records.");
+    readable.pipe(fs.createWriteStream('books.csv'));
+    readable.push("title,subtitle,author,narrator,imageUrl,audioSampleUrl,length,version,createdAt,updatedAt\n");
+  }
+
   for (let i = 0; i < number; i++) {
     const createdAtDate = generateCreatedAt();
     const newBook = {
-      title: capitalizeAllFirsts(faker.company.bs()) + ", ",
-      subtitle: capitalizeAllFirsts(faker.company.catchPhrase()) + ", ",
-      author: faker.name.findName() + ", ",
-      narrator: faker.name.findName() + ", ",
-      imageUrl: faker.image.imageUrl() + ", ",
-      audioSampleUrl: faker.internet.url() + ", ",
+      title: capitalizeAllFirsts(faker.company.bs()) + ",",
+      subtitle: capitalizeAllFirsts(faker.company.catchPhrase()) + ",",
+      author: faker.name.findName() + ",",
+      narrator: faker.name.findName() + ",",
+      imageUrl: faker.image.imageUrl() + ",",
+      audioSampleUrl: faker.internet.url() + ",",
       length: (getRandom(29) + 4) + " hours and " + getRandom(60) + " minutes" + ",",
-      version: getRandom(100) < 85 ? "Unabridged Audiobook" + ", " : "Abridged Audiobook" + ", ",
-      createdAt: createdAtDate.toISOString() + ", ",
+      version: getRandom(100) < 85 ? "Unabridged Audiobook" + "," : "Abridged Audiobook" + ",",
+      createdAt: createdAtDate.toISOString() + ",",
       updatedAt: generateUpdatedAt(createdAtDate).toISOString()
     }
     let stringToPush = "";
+    if (TARGET_DATABASE === 'neo4j') {
+      stringToPush += (i + 1) + ',';
+    }
     for (let key in newBook) {
       stringToPush += newBook[key];
     }
@@ -109,12 +136,21 @@ const createBooks = (number) => {
 
 const createBooksCategories = (numberBooks) => {
   const numberCategories = 200;
-  console.log("Creating bookscategories.csv with " + numberBooks + " records.");
+
   let onePercent = numberBooks / 100;
   let currentChunk = 1;
   const readable = new Stream.Readable();
-  readable.pipe(fs.createWriteStream('bookscategories.csv'));
-  readable.push("bookId, categoryId\n");
+
+  if (TARGET_DATABASE === 'neo4j') {
+    console.log("Creating bookscategories-neo4j.csv with " + numberBooks + " records.");
+    readable.pipe(fs.createWriteStream('bookscategories-neo4j.csv'));
+    readable.push(":START_ID(Book), :END_ID(Category)\n");
+  } else {
+    console.log("Creating bookscategories.csv with " + numberBooks + " records.");
+    readable.pipe(fs.createWriteStream('bookscategories.csv'));
+    readable.push("bookId, categoryId\n");
+  }
+
   const creationLoop = async () => {
     for (let i = 0; i < numberBooks; i++) {
       const firstCategory = getRandom(numberCategories) + 1;
@@ -124,8 +160,8 @@ const createBooksCategories = (numberBooks) => {
       } else {
         secondCategory = getRandom(numberCategories - firstCategory - 1) + firstCategory + 1;
       }
-      readable.push((i + 1) + ", " + (firstCategory) + "\n");
-      readable.push((i + 1) + ", " + (secondCategory) + "\n");
+      readable.push((i + 1) + "," + (firstCategory) + "\n");
+      readable.push((i + 1) + "," + (secondCategory) + "\n");
       if (i === currentChunk * onePercent) {
         console.log(currentChunk + "% complete.");
         currentChunk++;
@@ -142,5 +178,5 @@ const createBooksCategories = (numberBooks) => {
 }
 
 // createCategories(200);
-// createBooks(10000000);
+createBooks(10000000);
 // createBooksCategories(10000000);
