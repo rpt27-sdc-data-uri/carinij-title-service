@@ -20,3 +20,6 @@ testdb.js
 books.csv
 categories.csv
 bookscategories.csv
+books-neo4j.csv
+bookscategories-neo4j.csv
+categories-neo4j.csv
