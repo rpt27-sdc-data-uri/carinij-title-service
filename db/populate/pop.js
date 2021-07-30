@@ -136,9 +136,9 @@ const runAQuery = () => {
 // dropTables();
 // writeCSVToCategories();
 // writeCSVToBooks();
-// dropBooksCategories()
-//   .then(() => {
-//     writeCSVToBooksCategories();
-//   })
-runAQuery();
+dropBooksCategories()
+  .then(() => {
+    writeCSVToBooksCategories();
+  })
+// runAQuery();
 
