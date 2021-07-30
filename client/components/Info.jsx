@@ -22,7 +22,7 @@ class Info extends React.Component {
            }
            return (<span key={i}><a href="#">{category.name}</a>, </span>)
          })
-         }</li>
+        }</li>
         {/* <Rating id={this.props.book.id}/> */}
         </ul>
       </div>
