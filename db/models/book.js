@@ -15,6 +15,7 @@ module.exports.getById = (id) => {
       resolve(result);
     })
     .catch(err => {
+      console.log(err);
       reject(err);
     })
   });
