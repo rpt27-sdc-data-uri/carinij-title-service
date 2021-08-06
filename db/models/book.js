@@ -2,7 +2,7 @@ const { Op } = require('sequelize');
 const db = require('../db.js');
 
 module.exports.getById = (id) => {
-  console.log("Getting by id: " + id);
+  // console.log("Getting by id: " + id);
   return new Promise((resolve, reject) => {
     db.Book.findOne({
       where: {
@@ -11,7 +11,6 @@ module.exports.getById = (id) => {
       include: 'categories'
     })
     .then (result => {
-      console.log(result);
       resolve(result);
     })
     .catch(err => {
@@ -91,8 +90,8 @@ module.exports.getRelatedById = (id) => {
 };
 
 module.exports.createNewBook = (newBook) => {
-  console.log("Creating new book.");
-  console.log(newBook);
+  // console.log("Creating new book.");
+  // console.log(newBook);
   return new Promise((resolve, reject) => {
     db.Book.create({
       title: newBook.title,
@@ -104,23 +103,29 @@ module.exports.createNewBook = (newBook) => {
       length: newBook.length,
       version: newBook.version
     })
-    .then (result => {
-      resolve(result);
+    .then ((bookResult) => {
+      for (let i = 0; i < newBook.category.length; i++) {
+        db.Category.findOrCreate({
+          where: {name: newBook.category[i]}
+        })
+          .then((categoryResult) => {
+            db.BooksCategories.create({
+              bookId: bookResult.id,
+              categoryId: categoryResult[0].id
+            })
+              .catch(err => console.log("Error in BookCategory creation: " + err))
+          })
+          .catch(err => {
+            console.log("Error in Category creation: " + err);
+          })
+      }
+    })
+    .then(() => {
+      resolve({"response": "New book created '" + newBook.title + "' with categories: " + newBook.category})
     })
     .catch(err => {
       reject(err);
     })
-
-    // db.Category.findOrCreate({
-    //   default: { category: newBook.category }
-    // })
-    // .then (result => {
-    //   resolve(result);
-    // })
-    // .catch(err => {
-    //   reject(err);
-    // })
-
   });
 };
 
