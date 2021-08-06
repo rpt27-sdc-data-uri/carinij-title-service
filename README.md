@@ -72,7 +72,7 @@ DB_HOST={mysqlHost}
 
   - Books
   - Categories
-  - Book_Category
+  - BooksCategories
      * this table is a join table for the many to many relationship between Books and Categories
 
   MODELS:
@@ -127,7 +127,7 @@ PUT:
         "audioSampleUrl: "{audioSampleUrl}",
         "length": "{length}",
         "version": "{version}",
-        "category": ["{category}", "{category}", "{etc}"]
+        "category": ["{category}", "{category}"]
       }
       * All should be strings (including length)
       * Title, author, and narrator are required; the rest are strongly suggested

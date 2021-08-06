@@ -1,13 +1,19 @@
 const { Sequelize, DataTypes } = require('sequelize');
-require('dotenv').config();
+// require('dotenv').config();
 
 const sequelize = new Sequelize('audible', 'carinij', 'mypassword', {
   host: 'localhost',
   dialect: 'postgres',
-  logging: false
+  logging: false,
+  pool: {
+    max: 30,
+    min: 0,
+    acquire: 150000,
+    idle: 10000,
+  }
 })
 
-const testDatabaseConnection = sequelize.authenticate()
+sequelize.authenticate()
   .then(() => console.log("Connection has been established successfully."))
   .catch((err) => console.log(err));
 
@@ -34,11 +40,11 @@ const Book = sequelize.define('Book', {
     type: DataTypes.STRING
   },
   length: {
-    type: DataTypes.STRING(10)
+    type: DataTypes.STRING
   },
   version: {
     type: DataTypes.STRING
-  }
+  },
 });
 
 const Category = sequelize.define('Category', {
@@ -48,16 +54,10 @@ const Category = sequelize.define('Category', {
   }
 });
 
-const Book_Category = sequelize.define('Book_Category', {
-  id: {
-    type: DataTypes.INTEGER(11),
-    primaryKey: true,
-    autoIncrement: true
-  },
-  book_id: {
-    type: DataTypes.INTEGER(11),
+const BooksCategories = sequelize.define('BooksCategories', {
+  bookId: {
+    type: DataTypes.INTEGER,
     primaryKey: false,
-    unique: true,
     references: {
       model: Book,
       key: 'id',
@@ -65,10 +65,9 @@ const Book_Category = sequelize.define('Book_Category', {
     onDelete: 'cascade',
     onUpdate: 'cascade',
   },
-  category_id: {
-    type: DataTypes.INTEGER(11),
+  categoryId: {
+    type: DataTypes.INTEGER,
     primaryKey: false,
-    unique: true,
     references: {
       model: Category,
       key: 'id',
@@ -81,20 +80,21 @@ const Book_Category = sequelize.define('Book_Category', {
   freezeTableName: true
 });
 
-
 Book.belongsToMany(Category, {
-  through: Book_Category,
+  through: "BooksCategories",
   as: 'categories',
-  foreignKey: 'book_id'
+  foreignKey: 'bookId'
 });
 
 Category.belongsToMany(Book, {
-  through: Book_Category,
+  through: "BooksCategories",
   as: 'books',
-  foreignKey: 'category_id'
+  foreignKey: 'categoryId'
 });
+
+sequelize.sync();
 
 module.exports.sequelize = sequelize;
 module.exports.Book = Book;
 module.exports.Category = Category;
-module.exports.BookCategory = Book_Category;
+module.exports.BooksCategories = BooksCategories;
