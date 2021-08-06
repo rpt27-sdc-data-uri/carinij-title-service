@@ -4,11 +4,12 @@ const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = new Sequelize('audible', 'carinij', 'mypassword', {
   host: 'localhost',
   dialect: 'postgres',
-  // logging: false,
+  logging: false,
   pool: {
-    max: 20,
+    max: 30,
     min: 0,
-    acquire: 120000
+    acquire: 150000,
+    idle: 10000,
   }
 })
 
