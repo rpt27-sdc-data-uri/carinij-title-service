@@ -26,7 +26,8 @@
     "gen-csv": "node ./db/populate/gen-csv.js",
     "loadTestGet": "k6 run ./test/loadTestGet.js",
     "loadTestPost": "k6 run ./test/loadTestPost.js",
-    "ec2-s1": "ssh -i sdc-aws-key.pem ubuntu@ec2-54-153-120-83.us-west-1.compute.amazonaws.com"
+    "ec2-s1": "ssh -i sdc-aws-key.pem ubuntu@ec2-54-153-120-83.us-west-1.compute.amazonaws.com",
+    "ec2-db": "ssh -i sdc-aws-key.pem ubuntu@ec2-13-56-213-141.us-west-1.compute.amazonaws.com"
   },
   "repository": {
     "type": "git",

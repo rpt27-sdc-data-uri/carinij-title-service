@@ -1,8 +1,9 @@
 const { Sequelize, DataTypes } = require('sequelize');
 // require('dotenv').config();
 
-const sequelize = new Sequelize('audible', 'carinij', 'mypassword', {
-  host: 'localhost',
+const sequelize = new Sequelize('audible', 'ubuntu', 'mypassword', {
+  host: '13.56.213.141',
+  port: '5432',
   dialect: 'postgres',
   logging: false,
   pool: {
