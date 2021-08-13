@@ -1,8 +1,11 @@
 const { Sequelize, DataTypes } = require('sequelize');
-// require('dotenv').config();
+require('dotenv').config();
 
-const sequelize = new Sequelize('audible', 'ubuntu', 'mypassword', {
-  host: '13.56.213.141',
+console.log("DB_USER: " + process.env.DB_USER);
+console.log("DB_HOST: " + process.env.DB_HOST);
+
+const sequelize = new Sequelize('audible', process.env.DB_USER, 'mypassword', {
+  host: process.env.DB_HOST,
   port: '5432',
   dialect: 'postgres',
   logging: false,
