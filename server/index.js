@@ -11,7 +11,7 @@ console.log("Routes up and running.");
 
 // GET routes
 app.get('/api/book/:id', (req, res) => {
-  // console.log("Received GET request to /api/book/" + req.params.id);
+  console.log("Received GET request to /api/book/" + req.params.id);
   Book.getById(req.params.id)
     .then((result) => {
       res.send(result);
