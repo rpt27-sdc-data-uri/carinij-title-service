@@ -2,6 +2,7 @@ const fs = require('fs');
 const {Pool, Client} = require('pg');
 const copyFrom = require('pg-copy-streams').from;
 const progress = require('progress-stream');
+require('dotenv').config();
 
 const str = progress({
   length: 2300000000,
@@ -13,10 +14,10 @@ str.on('progress', (progress) => {
 });
 
 const pool = new Pool({
-  host: "13.56.213.141",
+  host: process.env.REMOTE_DB_HOST,
   port: "5432",
   database: "audible",
-  user: "ubuntu",
+  user: process.env.REMOTE_DB_USER,
   password: "mypassword",
 });
 
@@ -128,6 +129,8 @@ const dropBooksCategories = () => {
 
 const runAQuery = () => {
   return pool
+      .query('DROP TABLE IF EXISTS "Books"')
+      .then(res => console.log('"Books" table dropped.'))
 //    .query('SELECT * FROM "Books" JOIN "BooksCategories" ON "Books"."id" = "BooksCategories"."bookId" JOIN "Categories" ON "BooksCategories"."categoryId" = "Categories"."id" WHERE "Books"."author" = \'Andrew DuBuque\'')
 //    .query('UPDATE "Books" SET "author" = \'Dr. Bridget Sipes\' WHERE "Books"."author" = \'Bridget Sipes\'')
       // .query('CREATE TABLE IF NOT EXISTS "Books" ("id" SERIAL PRIMARY KEY, "title" TEXT, "subtitle" TEXT, "author" TEXT, "narrator" TEXT, "imageUrl" TEXT, "audioSampleUrl" TEXT, "length" TEXT, "version" TEXT, "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL, "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL);')
@@ -138,12 +141,13 @@ const runAQuery = () => {
 }
 
 
+
 // dropTables();
 // writeCSVToCategories();
-writeCSVToBooks();
+// writeCSVToBooks();
 // dropBooksCategories()
 //   .then(() => {
-// writeCSVToBooksCategories();
+//      writeCSVToBooksCategories();
 //   })
 // runAQuery();
 
