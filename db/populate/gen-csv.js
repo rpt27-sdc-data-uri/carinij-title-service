@@ -111,7 +111,7 @@ const createBooks = (number) => {
       narrator: faker.name.findName() + ",",
       imageUrl: faker.image.imageUrl() + ",",
       audioSampleUrl: faker.internet.url() + ",",
-      length: (getRandom(29) + 4) + " hours and " + getRandom(60) + " minutes" + ",",
+      length: (getRandom(29) + 4) + ":" + getRandom(60) + ",",
       version: getRandom(100) < 85 ? "Unabridged Audiobook" + "," : "Abridged Audiobook" + ",",
       createdAt: createdAtDate.toISOString() + ",",
       updatedAt: generateUpdatedAt(createdAtDate).toISOString()

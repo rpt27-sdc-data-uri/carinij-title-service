@@ -2,9 +2,10 @@ const fs = require('fs');
 const {Pool, Client} = require('pg');
 const copyFrom = require('pg-copy-streams').from;
 const progress = require('progress-stream');
+require('dotenv').config();
 
 const str = progress({
-  length: 246978449,
+  length: 2300000000,
   time: 1000
 });
 
@@ -13,10 +14,11 @@ str.on('progress', (progress) => {
 });
 
 const pool = new Pool({
-  host: "localhost",
+  host: process.env.REMOTE_DB_HOST,
+  port: "5432",
   database: "audible",
-  user: "carinij",
-  password: "mypassword",
+  user: process.env.REMOTE_DB_USER,
+  password: DB_PASSWORD,
 });
 
 pool.on('error', (err, client) => {
@@ -44,7 +46,7 @@ const writeCSVToCategories = () => {
           console.log('Categories writeStream finished.');
           done;
         });
-        readStream.pipe(writeStream);
+        readStream.pipe(str).pipe(writeStream);
       });
     })
     .catch(err => console.log('Error creating "Categories" table: ' + err));
@@ -70,7 +72,7 @@ const writeCSVToBooks = () => {
           console.log('Books writeStream finished.');
           done;
         });
-        readStream.pipe(writeStream);
+        readStream.pipe(str).pipe(writeStream);
       });
     })
     .catch(err => console.log('Error creating "Categories" table: ' + err));
@@ -127,18 +129,25 @@ const dropBooksCategories = () => {
 
 const runAQuery = () => {
   return pool
+      .query('DROP TABLE IF EXISTS "Books"')
+      .then(res => console.log('"Books" table dropped.'))
 //    .query('SELECT * FROM "Books" JOIN "BooksCategories" ON "Books"."id" = "BooksCategories"."bookId" JOIN "Categories" ON "BooksCategories"."categoryId" = "Categories"."id" WHERE "Books"."author" = \'Andrew DuBuque\'')
-    .query('UPDATE "Books" SET "author" = \'Dr. Bridget Sipes\' WHERE "Books"."author" = \'Bridget Sipes\'')
-    .then(res => console.log(res.rows));
+//    .query('UPDATE "Books" SET "author" = \'Dr. Bridget Sipes\' WHERE "Books"."author" = \'Bridget Sipes\'')
+      // .query('CREATE TABLE IF NOT EXISTS "Books" ("id" SERIAL PRIMARY KEY, "title" TEXT, "subtitle" TEXT, "author" TEXT, "narrator" TEXT, "imageUrl" TEXT, "audioSampleUrl" TEXT, "length" TEXT, "version" TEXT, "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL, "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL);')
+      //   .then(() => console.log('Create "Books" table successful.'))
+      // .query('INSERT INTO "Books" ("title", "subtitle", "author", "narrator", "imageUrl", "audioSampleUrl", "length", "version", "createdAt", "updatedAt") VALUES (\'TestBook\', \'A book for testing.\', \'Testy McTestpherson\', \'Schenectady Jones\', \'www.fakeurl.com/test.png\', \'www.fakeurl.com/test.mp4\', \'22 hrs 5 minutes\', \'Unabridged Audiobook\', \'2015-01-01\', \'2020-06-01\')')
+      //   .then(() => console.log('Insert successful.'))
+      //   .then(res => console.log(res.rows));
 }
+
 
 
 // dropTables();
 // writeCSVToCategories();
 // writeCSVToBooks();
-dropBooksCategories()
-  .then(() => {
-    writeCSVToBooksCategories();
-  })
+// dropBooksCategories()
+//   .then(() => {
+//      writeCSVToBooksCategories();
+//   })
 // runAQuery();
 

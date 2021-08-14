@@ -6,7 +6,7 @@ export let options = {
       executor: 'constant-arrival-rate',
       rate: 1000,
       timeUnit: '1s',
-      duration: '10s',
+      duration: '30s',
       preAllocatedVUs: 500,
       maxVUs: 5000,
     },
@@ -19,5 +19,5 @@ const getRandom = (max) => {
 
 export default function () {
   const id = getRandom(10000000);
-  http.get(`http://localhost:2002/api/book/${id}`)
+  http.get(`http://13.52.250.186:2002/api/book/${id}`)
 }

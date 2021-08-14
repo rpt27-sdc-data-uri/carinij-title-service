@@ -1,8 +1,12 @@
 const { Sequelize, DataTypes } = require('sequelize');
-// require('dotenv').config();
+require('dotenv').config();
 
-const sequelize = new Sequelize('audible', 'carinij', 'mypassword', {
-  host: 'localhost',
+console.log("DB_USER: " + process.env.DB_USER);
+console.log("DB_HOST: " + process.env.DB_HOST);
+
+const sequelize = new Sequelize('audible', process.env.DB_USER, process.env.DB_PASSWORD, {
+  host: process.env.DB_HOST,
+  port: '5432',
   dialect: 'postgres',
   logging: false,
   pool: {
@@ -14,7 +18,7 @@ const sequelize = new Sequelize('audible', 'carinij', 'mypassword', {
 })
 
 sequelize.authenticate()
-  .then(() => console.log("Connection has been established successfully."))
+  .then(() => console.log("Successfully connected to DB."))
   .catch((err) => console.log(err));
 
 const Book = sequelize.define('Book', {
