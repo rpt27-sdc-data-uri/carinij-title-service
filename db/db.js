@@ -18,7 +18,7 @@ const sequelize = new Sequelize('audible', process.env.DB_USER, process.env.DB_P
 })
 
 sequelize.authenticate()
-  .then(() => console.log("Connection has been established successfully."))
+  .then(() => console.log("Successfully connected to DB."))
   .catch((err) => console.log(err));
 
 const Book = sequelize.define('Book', {
