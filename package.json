@@ -70,6 +70,7 @@
     "express": "^4.17.1",
     "faker": "^5.5.3",
     "jest-fetch-mock": "^3.0.3",
+    "morgan": "^1.10.0",
     "mysql2": "^2.2.5",
     "node-sass": "^6.0.1",
     "pg": "^7.18.2",

@@ -2,16 +2,18 @@ const express  = require('express');
 const app = express();
 const cors = require('cors');
 const Book = require('../db/models/book.js');
+const morgan = require('morgan');
 
 app.use(cors());
 app.use(express.static('public'));
 app.use(express.json());
+morgan('short');
 
 console.log("Routes up and running.");
 
 // GET routes
 app.get('/api/book/:id', (req, res) => {
-  console.log("Received GET request to /api/book/" + req.params.id);
+  // console.log("Received GET request to /api/book/" + req.params.id);
   Book.getById(req.params.id)
     .then((result) => {
       res.send(result);

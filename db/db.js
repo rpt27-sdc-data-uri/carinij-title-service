@@ -4,7 +4,7 @@ require('dotenv').config();
 console.log("DB_USER: " + process.env.DB_USER);
 console.log("DB_HOST: " + process.env.DB_HOST);
 
-const sequelize = new Sequelize('audible', process.env.DB_USER, 'mypassword', {
+const sequelize = new Sequelize('audible', process.env.DB_USER, process.env.DB_PASSWORD, {
   host: process.env.DB_HOST,
   port: '5432',
   dialect: 'postgres',

@@ -18,7 +18,7 @@ const pool = new Pool({
   port: "5432",
   database: "audible",
   user: process.env.REMOTE_DB_USER,
-  password: "mypassword",
+  password: DB_PASSWORD,
 });
 
 pool.on('error', (err, client) => {
